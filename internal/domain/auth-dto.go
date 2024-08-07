@@ -7,6 +7,7 @@ type CodeRequest struct {
 type RegistryRequest struct {
 	Email string `json:"email"`
 	Code  string `json:"code"`
+	Role  string `json:"role"`
 }
 
 type RegistryResponse struct {

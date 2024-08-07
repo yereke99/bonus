@@ -2,6 +2,7 @@ package service
 
 import (
 	"bonus/config"
+	"bonus/internal/domain"
 	"context"
 
 	"go.uber.org/zap"
@@ -21,9 +22,14 @@ func NewAuthService(ctx context.Context, appConfig *config.Config, zapLogger *za
 	}
 }
 
-func (s *AuthService) Registry() error {
+func (s *AuthService) SendCode(code *domain.CodeRequest) error {
 
 	return nil
+}
+
+func (s *AuthService) Registry(model *domain.RegistryRequest) (*domain.RegistryResponse, error) {
+
+	return nil, nil
 }
 
 func (s *AuthService) Login() error {
