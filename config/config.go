@@ -7,8 +7,17 @@ import (
 )
 
 type Config struct {
-	UserName string `yaml:"USER_NAME"`
-	Password string `yaml:"PASSWORD"`
+	UserName       string         `yaml:"USER_NAME"`
+	Password       string         `yaml:"PASSWORD"`
+	DatabaseConfig DatabaseConfig `yaml:"database"` // Embed the DatabaseConfig struct
+}
+
+type DatabaseConfig struct {
+	Host     string `yaml:"host"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	Port     string `yaml:"port"`
+	Database string `yaml:"database"`
 }
 
 func NewConfig(fileName string) (*Config, error) {

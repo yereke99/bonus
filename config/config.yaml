@@ -1,2 +1,8 @@
-USER_NAME: your_username
-PASSWORD: your_password
+USER_NAME: myusername
+PASSWORD: mypassword
+database:
+  host: localhost
+  user: dbuser
+  password: dbpassword
+  port: "5432"
+  database: mydatabase
