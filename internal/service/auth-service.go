@@ -24,6 +24,8 @@ func NewAuthService(ctx context.Context, appConfig *config.Config, zapLogger *za
 
 func (s *AuthService) SendCode(code *domain.CodeRequest) error {
 
+	// here we are using method to send code to email while just code 1111
+
 	return nil
 }
 

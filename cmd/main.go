@@ -5,6 +5,7 @@ import (
 	"bonus/internal/handler"
 	"bonus/internal/httpserver"
 	"bonus/internal/service"
+	"bonus/pkg/database"
 	"bonus/pkg/logger"
 	"context"
 	"errors"
@@ -33,6 +34,12 @@ func main() {
 	conf, err := config.NewConfig(fileName)
 	if err != nil {
 		zapLogger.Error("error init config", zap.Error(err))
+		return
+	}
+
+	_, err = database.ConnectToDatabase(&conf.DatabaseConfig)
+	if err != nil {
+		zapLogger.Error("error connect to database", zap.Error(err))
 		return
 	}
 

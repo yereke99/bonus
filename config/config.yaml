@@ -2,7 +2,7 @@ USER_NAME: myusername
 PASSWORD: mypassword
 database:
   host: localhost
-  user: dbuser
-  password: dbpassword
+  user: postgres
+  password: postgres
   port: "5432"
-  database: mydatabase
+  database: postgres
