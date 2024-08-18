@@ -4,6 +4,7 @@ import (
 	"bonus/config"
 	"bonus/internal/handler"
 	"bonus/internal/httpserver"
+	"bonus/internal/repository"
 	"bonus/internal/service"
 	"bonus/pkg/database"
 	"bonus/pkg/logger"
@@ -37,13 +38,14 @@ func main() {
 		return
 	}
 
-	_, err = database.ConnectToDatabase(&conf.DatabaseConfig)
+	dbConn, err := database.ConnectToDatabase(&conf.DatabaseConfig)
 	if err != nil {
 		zapLogger.Error("error connect to database", zap.Error(err))
 		return
 	}
 
-	service := service.NewServices(ctx, conf, zapLogger)
+	repo := repository.NewRepository(dbConn)
+	service := service.NewServices(ctx, conf, zapLogger, repo)
 	handler := handler.NewHandler(service, zapLogger, conf)
 	server := httpserver.NewServer(handler.InitHandler())
 

@@ -7,10 +7,11 @@ CREATE TABLE IF NOT EXISTS customer(
     city VARCHAR(255),
     qr VARCHAR(800), 
     bonus INT,
+    token VARCHAR(800),
     isDeleted BOOLEAN 
 )
 
-CREATE TABLE IF NOT EXISTS code(
+CREATE TABLE IF NOT EXISTS code_cache(
     id BIGINT PRIMARY KEY,
     code INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

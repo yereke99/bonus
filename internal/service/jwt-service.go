@@ -20,9 +20,9 @@ func NewJWTService(secretKey, issuer string) *JWTService {
 }
 
 // GenerateToken generates a new JWT token
-func (s *JWTService) GenerateToken(userID string, role string) (string, error) {
+func (s *JWTService) GenerateToken(email string, role string) (string, error) {
 	claims := jwt.MapClaims{}
-	claims["user_id"] = userID
+	claims["user_id"] = email
 	claims["role"] = role
 	claims["exp"] = time.Now().Add(time.Hour * 1).Unix() // Token expires in 1 hour
 	claims["iss"] = s.issuer
