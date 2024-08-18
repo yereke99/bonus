@@ -3,6 +3,7 @@ package repository
 import (
 	"bonus/internal/domain"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -31,28 +32,36 @@ func (r *AuthRepository) InsertCode(user *domain.Registry) error {
 
 func (r *AuthRepository) CheckCode(user *domain.Registry) (bool, error) {
 	var createdAt time.Time
+	var code int
 
-	q := `SELECT created_at FROM code_cache WHERE email = $1 AND code = $2`
-	err := r.db.QueryRow(q, user.Email, user.Code).Scan(&createdAt)
+	q := `SELECT created_at, code FROM code_cache WHERE email = $1`
+	err := r.db.QueryRow(q, user.Email).Scan(&createdAt, &code)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, errors.New("code not found for the provided email")
+		}
 		return false, err
 	}
 
 	if time.Since(createdAt) > 10*time.Minute {
-		return false, nil
+		return false, errors.New("code has expired")
+	}
+
+	if code != user.Code {
+		return false, errors.New("invalid code")
 	}
 
 	return true, nil
 }
 
-func (r *AuthRepository) InsertUser(user *domain.RegistryRequest) (int64, error) {
+func (r *AuthRepository) InsertUser(user *domain.RegistryRequest) (*domain.RegistryResponse, error) {
 	q := `
         INSERT INTO customer(user_name, user_last_name, email, locations, city, qr, bonus, token, isDeleted) 
         VALUES($1, $2, $3, $4, $5, $6, $7, $8)
-        RETURNING id
+        RETURNING id, user_name, user_last_name, email, locations, city, qr, bonus, token, isDeleted
     `
 
-	var userID int64
+	var resp domain.RegistryResponse
 	err := r.db.QueryRow(q,
 		user.UserName,
 		user.UserLastName,
@@ -62,12 +71,23 @@ func (r *AuthRepository) InsertUser(user *domain.RegistryRequest) (int64, error)
 		user.QR,
 		user.Bonus,
 		user.IsDeleted,
-	).Scan(&userID)
+	).Scan(
+		&resp.ID,
+		&resp.UserName,
+		&resp.UserLastName,
+		&resp.Email,
+		&resp.Locations,
+		&resp.City,
+		&resp.QR,
+		&resp.Bonus,
+		&resp.Token,
+		&resp.IsDeleted,
+	)
 	if err != nil {
-		return 0, fmt.Errorf("could not insert user: %v", err)
+		return nil, fmt.Errorf("could not insert user: %v", err)
 	}
 
-	return userID, nil
+	return &resp, nil
 }
 
 func (r *AuthRepository) ChecUser(email string) (bool, error) {

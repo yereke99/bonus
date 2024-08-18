@@ -7,8 +7,8 @@ import (
 )
 
 type Config struct {
-	UserName       string         `yaml:"USER_NAME"`
-	Password       string         `yaml:"PASSWORD"`
+	SecretKey      string         `yaml:"SECRET_KEY"`
+	Issuer         string         `yaml:"ISSUER"`
 	DatabaseConfig DatabaseConfig `yaml:"database"` // Embed the DatabaseConfig struct
 }
 

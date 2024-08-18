@@ -8,9 +8,9 @@ import (
 )
 
 func (h *Handler) SendCode(c *gin.Context) {
-	var code domain.CodeRequest
+	var sign domain.Registry
 
-	if err := c.ShouldBindJSON(&code); err != nil {
+	if err := c.ShouldBindJSON(&sign); err != nil {
 		c.JSON(
 			http.StatusBadRequest, gin.H{
 				"error": err,
@@ -19,7 +19,17 @@ func (h *Handler) SendCode(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.AuthService.SendCode(&code); err != nil {
+	if err := h.service.AuthService.SendCode(&sign); err != nil {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err,
+			},
+		)
+		return
+	}
+
+	err := h.service.AuthService.SendCode(&sign)
+	if err != nil {
 		c.JSON(
 			http.StatusBadRequest, gin.H{
 				"error": err,
@@ -43,7 +53,7 @@ func (h *Handler) Registry(c *gin.Context) {
 		return
 	}
 
-	tokens, err := h.service.AuthService.Registry(&registry)
+	resp, err := h.service.AuthService.Registry(&registry)
 	if err != nil {
 		c.JSON(
 			http.StatusBadRequest, gin.H{
@@ -53,7 +63,7 @@ func (h *Handler) Registry(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, tokens)
+	c.JSON(http.StatusOK, resp)
 }
 
 func (h *Handler) Login(c *gin.Context) {
@@ -68,5 +78,15 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "")
+	resp, err := h.service.AuthService.Login(&registry)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err,
+			},
+		)
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
 }

@@ -11,7 +11,7 @@ import (
 )
 
 type IAuthServices interface {
-	SendCode(code *domain.CodeRequest) error
+	SendCode(sign *domain.Registry) error
 	Registry(model *domain.RegistryRequest) (*domain.RegistryResponse, error)
 	Login(login *domain.Registry) (*domain.LoginResponse, error)
 }
@@ -28,8 +28,9 @@ type Services struct {
 }
 
 func NewServices(ctx context.Context, appConfig *config.Config, zapLogger *zap.Logger, repo *repository.Repositories) *Services {
-
+	jwtServices := NewJWTService(appConfig.SecretKey, appConfig.Issuer)
 	return &Services{
-		AuthService: NewAuthService(ctx, appConfig, zapLogger, repo),
+		AuthService: NewAuthService(ctx, appConfig, zapLogger, repo, jwtServices),
+		JWTService:  jwtServices,
 	}
 }
