@@ -2,15 +2,13 @@ package database
 
 import (
 	"bonus/config"
+	"bonus/internal/domain"
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 
-	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
+	"go.uber.org/zap"
 )
 
 func ConnectToDatabase(databaseConfig *config.DatabaseConfig) (*sql.DB, error) {
@@ -32,24 +30,37 @@ func ConnectToDatabase(databaseConfig *config.DatabaseConfig) (*sql.DB, error) {
 		return nil, err
 	}
 
-	pwd, _ := os.Getwd()
-
-	log.Println("Current working directory:", pwd)
-
-	// Создаем объект миграции
-	m, err := migrate.New("file://./migration", connectionString)
-	if err != nil {
-		return nil, err
-	}
-	defer m.Close() // Закрываем объект миграции после использования
-
-	// Применяем миграции
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		return nil, err
-	}
-
-	log.Println("Миграция успешно выполнена")
 	log.Println("Connected to PostgreSQL database")
 
 	return db, nil
+}
+
+func Migrate(db *sql.DB, zapLogger *zap.Logger) error {
+	// List of table creation SQL statements
+	sqls := []string{
+		customerTable,
+		codeCacheTable,
+		companyTable,
+		businesTypesTable,
+	}
+
+	// Check if one of the tables already exists (e.g., `code_cache`)
+	query := `SELECT 1 FROM code_cache LIMIT 1`
+	_, err := db.Query(query)
+	if err == nil {
+		return domain.ErrExistsTable
+	}
+
+	// Execute each SQL statement
+	for _, sqlQuery := range sqls {
+		_, err := db.Exec(sqlQuery)
+		if err != nil {
+			zapLogger.Error("failed to execute migration", zap.Error(err), zap.String("query", sqlQuery))
+			return fmt.Errorf("failed to execute migration: %w", err)
+		}
+		zapLogger.Info("migration executed", zap.String("query", sqlQuery))
+	}
+
+	zapLogger.Info("All migrations executed successfully")
+	return nil
 }

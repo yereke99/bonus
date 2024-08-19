@@ -2,6 +2,7 @@ package main
 
 import (
 	"bonus/config"
+	"bonus/internal/domain"
 	"bonus/internal/handler"
 	"bonus/internal/httpserver"
 	"bonus/internal/repository"
@@ -42,6 +43,11 @@ func main() {
 	if err != nil {
 		zapLogger.Error("error connect to database", zap.Error(err))
 		return
+	}
+	defer dbConn.Close()
+
+	if err := database.Migrate(dbConn, zapLogger); !errors.Is(err, domain.ErrExistsTable) {
+		zapLogger.Error("error migrate to database", zap.Error(err))
 	}
 
 	repo := repository.NewRepository(dbConn)

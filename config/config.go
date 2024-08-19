@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"io/ioutil"
 
 	"gopkg.in/yaml.v2"
@@ -26,6 +27,8 @@ func NewConfig(fileName string) (*Config, error) {
 	if err := loadYAMLFile(fileName, cfg); err != nil {
 		return nil, err
 	}
+
+	fmt.Println(cfg.DatabaseConfig)
 
 	return cfg, nil
 }
