@@ -4,9 +4,9 @@ import (
 	"bonus/config"
 	"bonus/internal/service"
 	"net/http"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -29,16 +29,16 @@ func (h *Handler) InitHandler() *gin.Engine {
 	r := gin.Default()
 	r.Use(gin.Recovery())
 
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"PUT", "PATCH", "POST", "GET", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Content-Length", "Authorization", "X-CSRF-Token", "Content-Type", "Accept", "X-Requested-With", "Bearer", "Authority"},
-		ExposeHeaders:    []string{"Content-Length", "Authorization", "Content-Type", "application/json", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Accept", "Origin", "Cache-Control", "X-Requested-With"},
-		AllowCredentials: true,
-		AllowOriginFunc: func(origin string) bool {
-			return origin == "https://api.qkeruen.kz" // we must to change here
-		},
-	}))
+	/*
+		r.Use(cors.New(cors.Config{
+				AllowOrigins:     []string{"*"},
+				AllowMethods:     []string{"PUT", "PATCH", "POST", "GET", "DELETE", "OPTIONS"},
+				AllowHeaders:     []string{"Content-Length", "Authorization", "X-CSRF-Token", "Content-Type", "Accept", "X-Requested-With", "Bearer", "Authority"},
+				ExposeHeaders:    []string{"Content-Length", "Authorization", "Content-Type", "application/json", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Accept", "Origin", "Cache-Control", "X-Requested-With"},
+				AllowCredentials: true,
+				AllowOriginFunc:  func(origin string) bool { return origin == "https://api.qkeruen.kz" },
+			}))
+	*/
 
 	r.GET("/api/v1/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "pong")
@@ -47,6 +47,7 @@ func (h *Handler) InitHandler() *gin.Engine {
 	r.POST("/api/v1/code", h.SendCode)
 	r.POST("/api/v1/registry", h.Registry)
 	r.POST("/api/v1/login", h.Login)
+	r.POST("/api/v1/refresh", h.RefreshToken)
 
 	return r
 }
@@ -61,7 +62,15 @@ func (h *Handler) AuthorizeJWTUser() gin.HandlerFunc {
 			return
 		}
 
-		tokenString := authHeader
+		// Extract the Bearer token from the Authorization header
+		tokenParts := strings.Split(authHeader, " ")
+		if len(tokenParts) != 2 || tokenParts[0] != "Bearer" {
+			h.zapLogger.Error("Invalid Authorization header format")
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Invalid Authorization header format."})
+			return
+		}
+
+		tokenString := tokenParts[1]
 
 		token, err := h.service.JWTService.ValidateToken(tokenString)
 		if err != nil {
@@ -87,7 +96,7 @@ func (h *Handler) AuthorizeJWTUser() gin.HandlerFunc {
 	}
 }
 
-// AuthorizeJWTAdmin is a middleware function for authorizing JWT users
+// AuthorizeJWTAdmin is a middleware function for authorizing JWT admins
 func (h *Handler) AuthorizeJWTAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
@@ -97,7 +106,15 @@ func (h *Handler) AuthorizeJWTAdmin() gin.HandlerFunc {
 			return
 		}
 
-		tokenString := authHeader
+		// Extract the Bearer token from the Authorization header
+		tokenParts := strings.Split(authHeader, " ")
+		if len(tokenParts) != 2 || tokenParts[0] != "Bearer" {
+			h.zapLogger.Error("Invalid Authorization header format")
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Invalid Authorization header format."})
+			return
+		}
+
+		tokenString := tokenParts[1]
 
 		token, err := h.service.JWTService.ValidateToken(tokenString)
 		if err != nil {
@@ -113,7 +130,7 @@ func (h *Handler) AuthorizeJWTAdmin() gin.HandlerFunc {
 					c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"message": "Wrong type role"})
 					return
 				}
-				h.zapLogger.Info("user role", zap.Any("role", role))
+				h.zapLogger.Info("admin role", zap.Any("role", role))
 				c.Next()
 			} else {
 				h.zapLogger.Error("Invalid token", zap.Error(err))
@@ -123,7 +140,7 @@ func (h *Handler) AuthorizeJWTAdmin() gin.HandlerFunc {
 	}
 }
 
-// AuthorizeJWTPartner is a middleware function for authorizing JWT users
+// AuthorizeJWTPartner is a middleware function for authorizing JWT partners
 func (h *Handler) AuthorizeJWTPartner() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
@@ -133,7 +150,15 @@ func (h *Handler) AuthorizeJWTPartner() gin.HandlerFunc {
 			return
 		}
 
-		tokenString := authHeader
+		// Extract the Bearer token from the Authorization header
+		tokenParts := strings.Split(authHeader, " ")
+		if len(tokenParts) != 2 || tokenParts[0] != "Bearer" {
+			h.zapLogger.Error("Invalid Authorization header format")
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Invalid Authorization header format."})
+			return
+		}
+
+		tokenString := tokenParts[1]
 
 		token, err := h.service.JWTService.ValidateToken(tokenString)
 		if err != nil {
@@ -149,7 +174,7 @@ func (h *Handler) AuthorizeJWTPartner() gin.HandlerFunc {
 					c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"message": "Wrong type role"})
 					return
 				}
-				h.zapLogger.Info("user role", zap.Any("role", role))
+				h.zapLogger.Info("partner role", zap.Any("role", role))
 				c.Next()
 			} else {
 				h.zapLogger.Error("Invalid token", zap.Error(err))

@@ -6,6 +6,7 @@ import (
 	"bonus/internal/repository"
 	"context"
 	"errors"
+	"fmt"
 
 	"go.uber.org/zap"
 )
@@ -34,6 +35,7 @@ func (s *AuthService) SendCode(sign *domain.Registry) error {
 	sign.Code = 1111
 	err := s.repo.AuthRepository.InsertCode(sign)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 	return nil
@@ -63,6 +65,8 @@ func (s *AuthService) Registry(model *domain.RegistryRequest) (*domain.RegistryR
 	}
 	model.Token = refreshToken
 	model.IsDeleted = false
+
+	fmt.Println(model)
 	user, err := s.repo.AuthRepository.InsertUser(model)
 	if err != nil {
 		return nil, err

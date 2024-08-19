@@ -2,25 +2,26 @@ package database
 
 var (
 	customerTable = `
-	CREATE TABLE IF NOT EXISTS customer(
-		id BIGINT PRIMARY KEY,
-		user_name VARCHAR(255),
-		user_last_name VARCHAR(255),
-		email VARCHAR(255),
-		locations VARCHAR(255), 
-		city VARCHAR(255),
-		qr VARCHAR(800), 
-		bonus INT,
-		token VARCHAR(800),
-		isDeleted BOOLEAN 
-	)`
+	CREATE TABLE customer (
+        id SERIAL PRIMARY KEY,
+        user_name VARCHAR(255),
+        user_last_name VARCHAR(255),
+        email VARCHAR(255),
+        locations VARCHAR(255),
+        city VARCHAR(255),
+        qr VARCHAR(255),
+        bonus INT,
+        token TEXT,
+        isDeleted BOOLEAN
+    );`
 
 	codeCacheTable = `
-	CREATE TABLE IF NOT EXISTS code_cache(
-		id BIGINT PRIMARY KEY,
-		code INT,
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-	)`
+	CREATE TABLE code_cache (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) NOT NULL,
+        code INT NOT NULL,
+        created_at TIMESTAMP NOT NULL
+    );`
 
 	companyTable = `
 	CREATE TABLE IF NOT EXISTS company(

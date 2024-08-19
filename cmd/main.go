@@ -11,12 +11,10 @@ import (
 	"bonus/pkg/logger"
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"go.uber.org/zap"
 )
@@ -68,10 +66,12 @@ func main() {
 
 	cancelContext()
 
-	for i := 3; i > 0; i-- {
-		time.Sleep(time.Second)
-		fmt.Println(i)
-	}
+	/*
+		for i := 3; i > 0; i-- {
+			time.Sleep(time.Second)
+			fmt.Println(i)
+		}
+	*/
 
 	zapLogger.Info("application closed")
 }

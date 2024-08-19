@@ -2,41 +2,27 @@ package handler
 
 import (
 	"bonus/internal/domain"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (h *Handler) SendCode(c *gin.Context) {
 	var sign domain.Registry
-
+	fmt.Println("here")
 	if err := c.ShouldBindJSON(&sign); err != nil {
-		c.JSON(
-			http.StatusBadRequest, gin.H{
-				"error": err,
-			},
-		)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
+	fmt.Println("here2")
 
 	if err := h.service.AuthService.SendCode(&sign); err != nil {
-		c.JSON(
-			http.StatusBadRequest, gin.H{
-				"error": err,
-			},
-		)
+		c.JSON(http.StatusConflict, gin.H{"error": err})
 		return
 	}
-
-	err := h.service.AuthService.SendCode(&sign)
-	if err != nil {
-		c.JSON(
-			http.StatusBadRequest, gin.H{
-				"error": err,
-			},
-		)
-		return
-	}
+	fmt.Println("here3")
 
 	c.JSON(http.StatusOK, "sent")
 }
@@ -47,7 +33,7 @@ func (h *Handler) Registry(c *gin.Context) {
 	if err := c.ShouldBindJSON(&registry); err != nil {
 		c.JSON(
 			http.StatusBadRequest, gin.H{
-				"error": err,
+				"error": err.Error(),
 			},
 		)
 		return
@@ -57,13 +43,13 @@ func (h *Handler) Registry(c *gin.Context) {
 	if err != nil {
 		c.JSON(
 			http.StatusBadRequest, gin.H{
-				"error": err,
+				"error": err.Error(),
 			},
 		)
 		return
 	}
 
-	c.JSON(http.StatusOK, resp)
+	c.JSON(http.StatusCreated, resp)
 }
 
 func (h *Handler) Login(c *gin.Context) {
@@ -80,13 +66,54 @@ func (h *Handler) Login(c *gin.Context) {
 
 	resp, err := h.service.AuthService.Login(&registry)
 	if err != nil {
+		if err.Error() == "user does not exist" {
+			c.JSON(http.StatusOK, "code is valid, but user does not exist")
+			return
+		}
+		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+func (h *Handler) RefreshToken(c *gin.Context) {
+
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
 		c.JSON(
 			http.StatusBadRequest, gin.H{
-				"error": err,
+				"error": "Authorization header is missing",
 			},
 		)
 		return
 	}
 
+	// Split the "Bearer" prefix from the token
+	tokenParts := strings.Split(authHeader, " ")
+	if len(tokenParts) != 2 || tokenParts[0] != "Bearer" {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": "Invalid Authorization header format",
+			},
+		)
+		return
+	}
+
+	// The actual token is the second part
+	token := tokenParts[1]
+
+	// Call the service to refresh the token
+	resp, err := h.service.JWTService.RefreshToken(token)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	// Return the refreshed token in the response
 	c.JSON(http.StatusOK, resp)
 }

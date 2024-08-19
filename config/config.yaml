@@ -5,4 +5,4 @@ database:
   user: postgres
   password: 123456
   port: "5432"
-  database: yerek
+  database: user
