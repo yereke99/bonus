@@ -22,15 +22,21 @@ type IJWTServices interface {
 	ValidateToken(tokenString string) (*jwt.Token, error)
 }
 
+type ICompanyService interface {
+	CreateCompany(model *domain.Company) (*domain.Company, error)
+}
+
 type Services struct {
-	AuthService IAuthServices
-	JWTService  IJWTServices
+	AuthService    IAuthServices
+	JWTService     IJWTServices
+	CompanyService ICompanyService
 }
 
 func NewServices(ctx context.Context, appConfig *config.Config, zapLogger *zap.Logger, repo *repository.Repositories) *Services {
 	jwtServices := NewJWTService(appConfig.SecretKey, appConfig.Issuer)
 	return &Services{
-		AuthService: NewAuthService(ctx, appConfig, zapLogger, repo, jwtServices),
-		JWTService:  jwtServices,
+		AuthService:    NewAuthService(ctx, appConfig, zapLogger, repo, jwtServices),
+		CompanyService: NewCompanyService(ctx, appConfig, zapLogger, repo, jwtServices),
+		JWTService:     jwtServices,
 	}
 }

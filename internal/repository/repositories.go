@@ -13,13 +13,19 @@ type IAuthRepository interface {
 	GetUser(email string) (*domain.LoginResponse, error)
 }
 
+type ICompanyRepository interface {
+	CreateCompany(company *domain.Company) (*domain.Company, error)
+}
+
 type Repositories struct {
-	AuthRepository IAuthRepository
+	AuthRepository    IAuthRepository
+	CompanyRepository ICompanyRepository
 }
 
 func NewRepository(db *sql.DB) *Repositories {
 
 	return &Repositories{
-		AuthRepository: NewAuthRepository(db),
+		AuthRepository:    NewAuthRepository(db),
+		CompanyRepository: NewCompanyRepository(db),
 	}
 }

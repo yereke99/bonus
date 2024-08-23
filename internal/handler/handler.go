@@ -49,6 +49,8 @@ func (h *Handler) InitHandler() *gin.Engine {
 	r.POST("/api/v1/login", h.Login)
 	r.POST("/api/v1/refresh", h.RefreshToken)
 
+	r.POST("/api/v1/company", h.CreateCompany)
+
 	return r
 }
 

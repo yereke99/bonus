@@ -2,7 +2,6 @@ package handler
 
 import (
 	"bonus/internal/domain"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -11,18 +10,16 @@ import (
 
 func (h *Handler) SendCode(c *gin.Context) {
 	var sign domain.Registry
-	fmt.Println("here")
+
 	if err := c.ShouldBindJSON(&sign); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
-	fmt.Println("here2")
 
 	if err := h.service.AuthService.SendCode(&sign); err != nil {
 		c.JSON(http.StatusConflict, gin.H{"error": err})
 		return
 	}
-	fmt.Println("here3")
 
 	c.JSON(http.StatusOK, "sent")
 }

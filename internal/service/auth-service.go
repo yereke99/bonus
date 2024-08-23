@@ -4,6 +4,7 @@ import (
 	"bonus/config"
 	"bonus/internal/domain"
 	"bonus/internal/repository"
+	"bonus/traits"
 	"context"
 	"errors"
 	"fmt"
@@ -63,6 +64,11 @@ func (s *AuthService) Registry(model *domain.RegistryRequest) (*domain.RegistryR
 	if err != nil {
 		return nil, err
 	}
+
+	// Create a hash token for the QR code
+	qrToken := traits.GenerateQRToken(model.UserName, model.UserLastName, model.Email)
+
+	model.QR = qrToken
 	model.Token = refreshToken
 	model.IsDeleted = false
 
