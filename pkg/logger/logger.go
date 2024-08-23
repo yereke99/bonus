@@ -20,5 +20,5 @@ func NewLogger() (*zap.Logger, error) {
 			EncodeCaller: zapcore.ShortCallerEncoder,
 		},
 	}
-	return config.Build()
+	return config.Build(zap.AddCaller())
 }
