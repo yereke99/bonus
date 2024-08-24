@@ -13,7 +13,7 @@ import (
 
 func ConnectToDatabase(databaseConfig *config.DatabaseConfig) (*sql.DB, error) {
 	connectionString := fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		"postgres://%s:%s@%s:%s/%s?sslmode=require",
 		databaseConfig.User,
 		databaseConfig.Password,
 		databaseConfig.Host,
