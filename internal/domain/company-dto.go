@@ -11,3 +11,13 @@ type Company struct {
 	Bonus          int
 	IsDeleted      bool
 }
+
+type NotificationRequest struct{}
+
+type BonusCalculationRequest struct{}
+
+type BarcodeRequest struct{}
+
+type CommissionCalculationRequest struct{}
+
+type DoubleBonusRequest struct{}

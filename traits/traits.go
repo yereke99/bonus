@@ -26,3 +26,11 @@ func GenerateQRToken(userName, userLastName, email string) string {
 	// Convert the hash to a hexadecimal string
 	return hex.EncodeToString(hash.Sum(nil))
 }
+
+func SearchCompanies(name, city, s string) (string, error) {
+	return "", nil
+}
+
+func MonitorBonus() (string, error) {
+	return "", nil
+}

@@ -8,6 +8,8 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/zap"
 )
 
@@ -44,12 +46,32 @@ func (h *Handler) InitHandler() *gin.Engine {
 		c.JSON(http.StatusOK, "pong")
 	})
 
+	// Подключаем Swagger
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	r.POST("/api/v1/code", h.SendCode)
 	r.POST("/api/v1/registry", h.Registry)
 	r.POST("/api/v1/login", h.Login)
 	r.POST("/api/v1/refresh", h.RefreshToken)
 
-	r.POST("/api/v1/company", h.CreateCompany)
+	r.GET("/api/v1/user/history")
+	r.POST("/api/v1/user/notify")
+
+	r.POST("/api/v1/company", h.CreateCompany)                            // Создания компаний
+	r.GET("/api/v1/company", h.GetCompanies)                              // Список компаний
+	r.POST("/api/v1/company/notify", h.NotifyUser)                        // Уведление
+	r.POST("/api/v1/company/bonus", h.CalculateBonus)                     // Расчет бонуса
+	r.POST("/api/v1/company/add-code", h.AddBarcode)                      // привязка штрих кода
+	r.POST("/api/v1/company/calculate-commission", h.CalculateCommission) // вычисление комиссия
+	r.GET("/api/v1/company/monitoring-bonus")                             // Мониторинг бонусов и продаж
+	r.GET("/api/v1/company/monitoring-partner-sale")                      // Мониторинг партнеров и пользователей
+	r.POST("/api/v1/company/working-bonus")                               // Функционал работы с бонусными счетами
+	r.POST("/api/v1/company/increase-bonus", h.DoubleBonus)               // Удвоение бонусного баланса
+	r.GET("/api/v1/company/searching")                                    // Поиск и отображение информации
+	r.GET("/api/v1/company/information")                                  // Информационный модуль
+
+	r.POST("/api/v1/module/control") // Модуль управления бонусными счетами
+	r.POST("/api/v1//bonus/sale")    // Приветственные бонусы
 
 	return r
 }
