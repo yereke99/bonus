@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -31,16 +32,14 @@ func (h *Handler) InitHandler() *gin.Engine {
 	r := gin.Default()
 	r.Use(gin.Recovery())
 
-	/*
-		r.Use(cors.New(cors.Config{
-				AllowOrigins:     []string{"*"},
-				AllowMethods:     []string{"PUT", "PATCH", "POST", "GET", "DELETE", "OPTIONS"},
-				AllowHeaders:     []string{"Content-Length", "Authorization", "X-CSRF-Token", "Content-Type", "Accept", "X-Requested-With", "Bearer", "Authority"},
-				ExposeHeaders:    []string{"Content-Length", "Authorization", "Content-Type", "application/json", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Accept", "Origin", "Cache-Control", "X-Requested-With"},
-				AllowCredentials: true,
-				AllowOriginFunc:  func(origin string) bool { return origin == "https://api.qkeruen.kz" },
-			}))
-	*/
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"PUT", "PATCH", "POST", "GET", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Content-Length", "Authorization", "X-CSRF-Token", "Content-Type", "Accept", "X-Requested-With", "Bearer", "Authority"},
+		ExposeHeaders:    []string{"Content-Length", "Authorization", "Content-Type", "application/json", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Accept", "Origin", "Cache-Control", "X-Requested-With"},
+		AllowCredentials: true,
+		AllowOriginFunc:  func(origin string) bool { return origin == "http://localhost:5173" },
+	}))
 
 	r.GET("/api/v1/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "pong")
@@ -54,6 +53,7 @@ func (h *Handler) InitHandler() *gin.Engine {
 	r.POST("/api/v1/login", h.Login)
 	r.POST("/api/v1/refresh", h.RefreshToken)
 
+	// 2nd
 	r.GET("/api/v1/user/history")
 	r.POST("/api/v1/user/notify")
 
