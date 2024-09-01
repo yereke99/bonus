@@ -41,15 +41,13 @@ func (h *Handler) CreateCompany(c *gin.Context) {
 // @Failure 500 {object} map[string]string{"error": "Internal Server Error"}
 // @Router /api/v1/company [get]
 func (h *Handler) GetCompanies(c *gin.Context) {
-	/*
-		companies, err := h.service.CompanyService.GetCompanies()
-			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch companies"})
-				return
-			}
-	*/
+	companies, err := h.service.CompanyService.GetCompanies()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch companies"})
+		return
+	}
 
-	c.JSON(http.StatusOK, "")
+	c.JSON(http.StatusOK, companies)
 }
 
 // NotifyUser godoc
