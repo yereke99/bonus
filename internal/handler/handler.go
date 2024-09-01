@@ -50,6 +50,7 @@ func (h *Handler) InitHandler() *gin.Engine {
 
 	r.POST("/api/v1/code", h.SendCode)
 	r.POST("/api/v1/registry", h.Registry)
+	r.PATCH("/api/v1/registry/:id", h.UpdateRegistry)
 	r.POST("/api/v1/login", h.Login)
 	r.POST("/api/v1/refresh", h.RefreshToken)
 

@@ -13,6 +13,7 @@ import (
 type IAuthServices interface {
 	SendCode(sign *domain.Registry) error
 	Registry(model *domain.RegistryRequest) (*domain.RegistryResponse, error)
+	UpdateUser(userId int64, model *domain.RegistryRequest) (*domain.RegistryResponse, error)
 	Login(login *domain.Registry) (*domain.LoginResponse, error)
 }
 

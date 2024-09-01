@@ -82,6 +82,17 @@ func (s *AuthService) Registry(model *domain.RegistryRequest) (*domain.RegistryR
 	return user, nil
 }
 
+func (s *AuthService) UpdateUser(userId int64, model *domain.RegistryRequest) (*domain.RegistryResponse, error) {
+
+	fmt.Println(model)
+	user, err := s.repo.AuthRepository.UpdateUser(userId, model)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 func (s *AuthService) CheckUser(email string) (bool, error) {
 	return s.repo.AuthRepository.ChecUser(email)
 }

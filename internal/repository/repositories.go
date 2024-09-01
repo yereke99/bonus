@@ -9,6 +9,7 @@ type IAuthRepository interface {
 	InsertCode(user *domain.Registry) error
 	CheckCode(user *domain.Registry) (bool, error)
 	InsertUser(user *domain.RegistryRequest) (*domain.RegistryResponse, error)
+	UpdateUser(userID int64, user *domain.RegistryRequest) (*domain.RegistryResponse, error)
 	ChecUser(email string) (bool, error)
 	GetUser(email string) (*domain.LoginResponse, error)
 }

@@ -117,6 +117,60 @@ func (r *AuthRepository) InsertUser(user *domain.RegistryRequest) (*domain.Regis
 	return &resp, nil
 }
 
+func (r *AuthRepository) UpdateUser(userID int64, user *domain.RegistryRequest) (*domain.RegistryResponse, error) {
+	// Начальный шаблон для запроса
+	query := "UPDATE customer SET"
+	args := []interface{}{}
+	argIndex := 1
+
+	// Проверяем и добавляем в запрос соответствующие поля, если они не пустые
+	if user.UserName != "" {
+		query += fmt.Sprintf(" user_name = $%d,", argIndex)
+		args = append(args, user.UserName)
+		argIndex++
+	}
+	if user.UserLastName != "" {
+		query += fmt.Sprintf(" user_last_name = $%d,", argIndex)
+		args = append(args, user.UserLastName)
+		argIndex++
+	}
+	if user.Locations != "" {
+		query += fmt.Sprintf(" locations = $%d,", argIndex)
+		args = append(args, user.Locations)
+		argIndex++
+	}
+	if user.City != "" {
+		query += fmt.Sprintf(" city = $%d,", argIndex)
+		args = append(args, user.City)
+		argIndex++
+	}
+
+	// Удаляем последнюю запятую и добавляем условие WHERE
+	query = query[:len(query)-1]
+	query += fmt.Sprintf(" WHERE id = $%d RETURNING id, user_name, user_last_name, email, locations, city, qr, bonus, token, isDeleted", argIndex)
+	args = append(args, userID)
+
+	// Выполнение запроса
+	var resp domain.RegistryResponse
+	err := r.db.QueryRow(query, args...).Scan(
+		&resp.ID,
+		&resp.UserName,
+		&resp.UserLastName,
+		&resp.Email,
+		&resp.Locations,
+		&resp.City,
+		&resp.QR,
+		&resp.Bonus,
+		&resp.Token,
+		&resp.IsDeleted,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("could not update user: %v", err)
+	}
+
+	return &resp, nil
+}
+
 func (r *AuthRepository) ChecUser(email string) (bool, error) {
 	q := `SELECT email FROM customer WHERE email = $1`
 
