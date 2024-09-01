@@ -22,7 +22,7 @@ func (r *CompanyRepository) CreateCompany(company *domain.CompanyRequest) (*doma
 
 	insertedCompany := &domain.Company{}
 
-	// Execute the query and scan the returned row into the insertedCompany struct
+	var isDeleted sql.NullBool
 	err := r.db.QueryRow(query, company.Company, company.CompanyName, company.Email, company.City, company.CompanyAddress, company.CompanyIIN, company.Bonus).Scan(
 		&insertedCompany.ID,
 		&insertedCompany.Company,
@@ -32,11 +32,14 @@ func (r *CompanyRepository) CreateCompany(company *domain.CompanyRequest) (*doma
 		&insertedCompany.CompanyAddress,
 		&insertedCompany.CompanyIIN,
 		&insertedCompany.Bonus,
-		&insertedCompany.IsDeleted,
+		&isDeleted,
 	)
 	if err != nil {
 		return nil, err
 	}
+
+	// Устанавливаем значение isDeleted в insertedCompany
+	insertedCompany.IsDeleted = isDeleted.Valid && isDeleted.Bool
 
 	return insertedCompany, nil
 }
