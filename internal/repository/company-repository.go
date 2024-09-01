@@ -20,7 +20,6 @@ func (r *CompanyRepository) CreateCompany(company *domain.CompanyRequest) (*doma
 			  VALUES ($1, $2, $3, $4, $5, $6, $7)
 			  RETURNING id, company, company_name, email, city, company_addres, company_iin, bonus, isDeleted`
 
-	// Create a variable to hold the inserted company details
 	insertedCompany := &domain.Company{}
 
 	// Execute the query and scan the returned row into the insertedCompany struct
