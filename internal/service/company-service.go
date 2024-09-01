@@ -30,3 +30,7 @@ func NewCompanyService(ctx context.Context, appConfig *config.Config, zapLogger 
 func (s *CompanyService) CreateCompany(model *domain.Company) (*domain.Company, error) {
 	return s.repo.CompanyRepository.CreateCompany(model)
 }
+
+func (s *CompanyService) GetCompanies() ([]*domain.Company, error) {
+	return s.repo.CompanyRepository.GetCompanies()
+}

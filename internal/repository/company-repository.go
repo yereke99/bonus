@@ -41,3 +41,40 @@ func (r *CompanyRepository) CreateCompany(company *domain.Company) (*domain.Comp
 
 	return insertedCompany, nil
 }
+
+func (r *CompanyRepository) GetCompanies() ([]*domain.Company, error) {
+	query := `SELECT id, company, company_name, email, city, company_addres, company_iin, bonus, isDeleted FROM company`
+
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var companies []*domain.Company
+
+	for rows.Next() {
+		company := &domain.Company{}
+		err := rows.Scan(
+			&company.ID,
+			&company.Company,
+			&company.CompanyName,
+			&company.Email,
+			&company.City,
+			&company.CompanyAddress,
+			&company.CompanyIIN,
+			&company.Bonus,
+			&company.IsDeleted,
+		)
+		if err != nil {
+			return nil, err
+		}
+		companies = append(companies, company)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return companies, nil
+}
