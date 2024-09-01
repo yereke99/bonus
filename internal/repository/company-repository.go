@@ -15,17 +15,16 @@ func NewCompanyRepository(db *sql.DB) *CompanyRepository {
 	}
 }
 
-func (r *CompanyRepository) CreateCompany(company *domain.Company) (*domain.Company, error) {
-	query := `INSERT INTO company (id, company, company_name, email, city, company_addres, company_iin, bonus, isDeleted) 
-			  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+func (r *CompanyRepository) CreateCompany(company *domain.CompanyRequest) (*domain.Company, error) {
+	query := `INSERT INTO company (company, company_name, email, city, company_addres, company_iin, bonus) 
+			  VALUES (?, ?, ?, ?, ?, ?, ?)
 			  RETURNING id, company, company_name, email, city, company_addres, company_iin, bonus, isDeleted`
 
 	// Create a variable to hold the inserted company details
 	insertedCompany := &domain.Company{}
 
 	// Execute the query and scan the returned row into the insertedCompany struct
-	err := r.db.QueryRow(query, company.ID, company.Company, company.CompanyName, company.Email, company.City, company.CompanyAddress, company.CompanyIIN, company.Bonus, company.IsDeleted).Scan(
-		&insertedCompany.ID,
+	err := r.db.QueryRow(query, company.Company, company.CompanyName, company.Email, company.City, company.CompanyAddress, company.CompanyIIN, company.Bonus).Scan(
 		&insertedCompany.Company,
 		&insertedCompany.CompanyName,
 		&insertedCompany.Email,
@@ -33,7 +32,6 @@ func (r *CompanyRepository) CreateCompany(company *domain.Company) (*domain.Comp
 		&insertedCompany.CompanyAddress,
 		&insertedCompany.CompanyIIN,
 		&insertedCompany.Bonus,
-		&insertedCompany.IsDeleted,
 	)
 	if err != nil {
 		return nil, err

@@ -14,7 +14,7 @@ type IAuthRepository interface {
 }
 
 type ICompanyRepository interface {
-	CreateCompany(company *domain.Company) (*domain.Company, error)
+	CreateCompany(company *domain.CompanyRequest) (*domain.Company, error)
 	GetCompanies() ([]*domain.Company, error)
 }
 

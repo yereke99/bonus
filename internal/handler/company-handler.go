@@ -9,7 +9,7 @@ import (
 )
 
 func (h *Handler) CreateCompany(c *gin.Context) {
-	var company *domain.Company
+	var company *domain.CompanyRequest
 	if err := c.ShouldBindJSON(&company); err != nil {
 		c.JSON(
 			http.StatusBadRequest, gin.H{
@@ -19,7 +19,7 @@ func (h *Handler) CreateCompany(c *gin.Context) {
 		return
 	}
 
-	resp, err := h.service.CompanyService.CreateCompany(company)
+	resp, err := h.service.CompanyService.CreateCompany(domain.CompanyRequest)
 	if err != nil {
 		c.JSON(
 			http.StatusConflict, gin.H{

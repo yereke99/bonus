@@ -23,7 +23,7 @@ type IJWTServices interface {
 }
 
 type ICompanyService interface {
-	CreateCompany(model *domain.Company) (*domain.Company, error)
+	CreateCompany(model *domain.CompanyRequest) (*domain.Company, error)
 	GetCompanies() ([]*domain.Company, error)
 }
 
