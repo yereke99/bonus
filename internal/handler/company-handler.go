@@ -19,7 +19,7 @@ func (h *Handler) CreateCompany(c *gin.Context) {
 		return
 	}
 
-	resp, err := h.service.CompanyService.CreateCompany(domain.CompanyRequest)
+	resp, err := h.service.CompanyService.CreateCompany(company)
 	if err != nil {
 		c.JSON(
 			http.StatusConflict, gin.H{
