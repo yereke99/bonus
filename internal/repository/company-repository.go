@@ -57,6 +57,8 @@ func (r *CompanyRepository) GetCompanies() ([]*domain.Company, error) {
 
 	for rows.Next() {
 		company := &domain.Company{}
+		var isDeleted sql.NullBool
+
 		err := rows.Scan(
 			&company.ID,
 			&company.Company,
@@ -66,11 +68,15 @@ func (r *CompanyRepository) GetCompanies() ([]*domain.Company, error) {
 			&company.CompanyAddress,
 			&company.CompanyIIN,
 			&company.Bonus,
-			&company.IsDeleted,
+			&isDeleted,
 		)
 		if err != nil {
 			return nil, err
 		}
+
+		// Устанавливаем значение isDeleted в компании
+		company.IsDeleted = isDeleted.Valid && isDeleted.Bool
+
 		companies = append(companies, company)
 	}
 
