@@ -43,7 +43,7 @@ func (h *Handler) CreateCompany(c *gin.Context) {
 func (h *Handler) GetCompanies(c *gin.Context) {
 	companies, err := h.service.CompanyService.GetCompanies()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch companies"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
