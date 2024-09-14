@@ -16,15 +16,25 @@ func NewCompanyRepository(db *sql.DB) *CompanyRepository {
 }
 
 func (r *CompanyRepository) CreateCompany(company *domain.CompanyRequest) (*domain.Company, error) {
-	query := `INSERT INTO company (company, company_name, email, city, company_addres, company_iin, bonus) 
-			  VALUES ($1, $2, $3, $4, $5, $6, $7)
-			  RETURNING id, company, company_name, email, city, company_addres, company_iin, bonus, isDeleted`
+	query := `
+		INSERT INTO company (company, company_name, email, city, company_address, company_iin, bonus) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		RETURNING id, company, company_name, email, city, company_address, company_iin, bonus, isDeleted
+	`
 
 	insertedCompany := &domain.Company{}
 
 	var isDeleted sql.NullBool
-	err := r.db.QueryRow(query, company.Company, company.CompanyName, company.Email, company.City, company.CompanyAddress, company.CompanyIIN, company.Bonus).Scan(
-		&insertedCompany.ID,
+	err := r.db.QueryRow(query,
+		company.Company,
+		company.CompanyName,
+		company.Email,
+		company.City,
+		company.CompanyAddress,
+		company.CompanyIIN,
+		company.Bonus,
+	).Scan(
+		&insertedCompany.ID, // ID is now a string
 		&insertedCompany.Company,
 		&insertedCompany.CompanyName,
 		&insertedCompany.Email,
@@ -38,14 +48,17 @@ func (r *CompanyRepository) CreateCompany(company *domain.CompanyRequest) (*doma
 		return nil, err
 	}
 
-	// Устанавливаем значение isDeleted в insertedCompany
+	// Set isDeleted value in insertedCompany
 	insertedCompany.IsDeleted = isDeleted.Valid && isDeleted.Bool
 
 	return insertedCompany, nil
 }
 
 func (r *CompanyRepository) GetCompanies() ([]*domain.Company, error) {
-	query := `SELECT id, company, company_name, email, city, company_addres, company_iin, bonus, isDeleted FROM company`
+	query := `
+		SELECT id, company, company_name, email, city, company_address, company_iin, bonus, isDeleted
+		FROM company
+	`
 
 	rows, err := r.db.Query(query)
 	if err != nil {
@@ -60,7 +73,7 @@ func (r *CompanyRepository) GetCompanies() ([]*domain.Company, error) {
 		var isDeleted sql.NullBool
 
 		err := rows.Scan(
-			&company.ID,
+			&company.ID, // ID is now a string
 			&company.Company,
 			&company.CompanyName,
 			&company.Email,
@@ -74,7 +87,7 @@ func (r *CompanyRepository) GetCompanies() ([]*domain.Company, error) {
 			return nil, err
 		}
 
-		// Устанавливаем значение isDeleted в компании
+		// Set isDeleted value in company
 		company.IsDeleted = isDeleted.Valid && isDeleted.Bool
 
 		companies = append(companies, company)

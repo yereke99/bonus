@@ -32,6 +32,14 @@ func (h *Handler) CreateCompany(c *gin.Context) {
 	c.JSON(http.StatusCreated, resp)
 }
 
+func (h *Handler) CreateCompanyObject(c *gin.Context) {
+
+}
+
+func (h *Handler) CompanyLogin(c *gin.Context) {
+
+}
+
 // GetCompanies godoc
 // @Summary Get list of companies
 // @Description Retrieves a list of all companies.

@@ -59,6 +59,8 @@ func (h *Handler) InitHandler() *gin.Engine {
 	r.POST("/api/v1/user/notify")
 
 	r.POST("/api/v1/company", h.CreateCompany)                            // Создания компаний
+	r.POST("/api/v1/create-company-object")                               // Создание объекта для компании
+	r.POST("/api/v1/company-object/login")                                // Логин продавца в объект компании
 	r.GET("/api/v1/company", h.GetCompanies)                              // Список компаний
 	r.POST("/api/v1/company/notify", h.NotifyUser)                        // Уведление
 	r.POST("/api/v1/company/bonus", h.CalculateBonus)                     // Расчет бонуса

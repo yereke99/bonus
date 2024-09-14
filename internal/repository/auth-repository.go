@@ -13,14 +13,12 @@ type AuthRepository struct {
 }
 
 func NewAuthRepository(db *sql.DB) *AuthRepository {
-
 	return &AuthRepository{
 		db: db,
 	}
 }
 
 func (r *AuthRepository) InsertCode(user *domain.Registry) error {
-
 	currentTime := time.Now()
 
 	// Check if the email already exists
@@ -57,12 +55,9 @@ func (r *AuthRepository) CheckCode(user *domain.Registry) (bool, error) {
 	q := `SELECT created_at, code FROM code_cache WHERE email = $1`
 	err := r.db.QueryRow(q, user.Email).Scan(&createdAt, &code)
 	if err != nil {
-		fmt.Println("here")
 		if errors.Is(err, sql.ErrNoRows) {
-			fmt.Println("here")
 			return false, errors.New("code not found for the provided email")
 		}
-		fmt.Println(err)
 		return false, err
 	}
 
@@ -73,7 +68,6 @@ func (r *AuthRepository) CheckCode(user *domain.Registry) (bool, error) {
 
 	// Validate the code
 	if code != user.Code {
-		fmt.Println("here")
 		return false, errors.New("invalid code")
 	}
 
@@ -82,10 +76,10 @@ func (r *AuthRepository) CheckCode(user *domain.Registry) (bool, error) {
 
 func (r *AuthRepository) InsertUser(user *domain.RegistryRequest) (*domain.RegistryResponse, error) {
 	q := `
-        INSERT INTO customer(user_name, user_last_name, email, locations, city, qr, bonus, token, isDeleted) 
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
-        RETURNING id, user_name, user_last_name, email, locations, city, qr, bonus, token, isDeleted
-    `
+		INSERT INTO customer(user_name, user_last_name, email, locations, city, qr, bonus, token, isDeleted)
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		RETURNING id, user_name, user_last_name, email, locations, city, qr, bonus, token, isDeleted
+	`
 
 	var resp domain.RegistryResponse
 	err := r.db.QueryRow(q,
@@ -117,13 +111,13 @@ func (r *AuthRepository) InsertUser(user *domain.RegistryRequest) (*domain.Regis
 	return &resp, nil
 }
 
-func (r *AuthRepository) UpdateUser(userID int64, user *domain.RegistryRequest) (*domain.RegistryResponse, error) {
-	// Начальный шаблон для запроса
+func (r *AuthRepository) UpdateUser(userID string, user *domain.RegistryRequest) (*domain.RegistryResponse, error) {
+	// Starting query template
 	query := "UPDATE customer SET"
 	args := []interface{}{}
 	argIndex := 1
 
-	// Проверяем и добавляем в запрос соответствующие поля, если они не пустые
+	// Check and add fields to the query if they are not empty
 	if user.UserName != "" {
 		query += fmt.Sprintf(" user_name = $%d,", argIndex)
 		args = append(args, user.UserName)
@@ -145,12 +139,15 @@ func (r *AuthRepository) UpdateUser(userID int64, user *domain.RegistryRequest) 
 		argIndex++
 	}
 
-	// Удаляем последнюю запятую и добавляем условие WHERE
+	// Remove the last comma and add WHERE clause
+	if len(args) == 0 {
+		return nil, errors.New("no fields to update")
+	}
 	query = query[:len(query)-1]
 	query += fmt.Sprintf(" WHERE id = $%d RETURNING id, user_name, user_last_name, email, locations, city, qr, bonus, token, isDeleted", argIndex)
 	args = append(args, userID)
 
-	// Выполнение запроса
+	// Execute the query
 	var resp domain.RegistryResponse
 	err := r.db.QueryRow(query, args...).Scan(
 		&resp.ID,
@@ -171,7 +168,7 @@ func (r *AuthRepository) UpdateUser(userID int64, user *domain.RegistryRequest) 
 	return &resp, nil
 }
 
-func (r *AuthRepository) ChecUser(email string) (bool, error) {
+func (r *AuthRepository) CheckUser(email string) (bool, error) {
 	q := `SELECT email FROM customer WHERE email = $1`
 
 	var retrievedEmail string
@@ -181,19 +178,19 @@ func (r *AuthRepository) ChecUser(email string) (bool, error) {
 	}
 
 	if err != nil {
-		return false, nil
+		return false, fmt.Errorf("error checking user: %v", err)
 	}
 
-	// if user exists
+	// User exists
 	return true, nil
 }
 
 func (r *AuthRepository) GetUser(email string) (*domain.LoginResponse, error) {
 	q := `
-        SELECT id, user_name, user_last_name, email, locations, city, qr, bonus, token, isDeleted 
-        FROM customer 
-        WHERE email = $1 AND isDeleted = false
-    `
+		SELECT id, user_name, user_last_name, email, locations, city, qr, bonus, token, isDeleted
+		FROM customer
+		WHERE email = $1 AND isDeleted = false
+	`
 
 	var user domain.LoginResponse
 

@@ -41,7 +41,7 @@ func Migrate(db *sql.DB, zapLogger *zap.Logger) error {
 		customerTable,
 		codeCacheTable,
 		companyTable,
-		businesTypesTable,
+		businessTypesTable,
 	}
 
 	// Check if one of the tables already exists (e.g., `code_cache`)

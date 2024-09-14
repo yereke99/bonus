@@ -3,7 +3,6 @@ package handler
 import (
 	"bonus/internal/domain"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -54,17 +53,7 @@ func (h *Handler) UpdateRegistry(c *gin.Context) {
 	var registry domain.RegistryRequest
 
 	// Получаем ID из параметров маршрута
-	idParam := c.Param("id")
-	userID, err := strconv.ParseInt(idParam, 10, 64)
-	if err != nil {
-		c.JSON(
-			http.StatusBadRequest, gin.H{
-				"error": "invalid user ID",
-			},
-		)
-		return
-	}
-
+	userID := c.Param("id")
 	// Привязываем тело запроса к структуре
 	if err := c.ShouldBindJSON(&registry); err != nil {
 		c.JSON(
