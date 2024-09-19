@@ -3,6 +3,11 @@ package repository
 import (
 	"bonus/internal/domain"
 	"database/sql"
+	"errors"
+	"fmt"
+	"log"
+
+	"github.com/google/uuid"
 )
 
 type CompanyRepository struct {
@@ -52,6 +57,47 @@ func (r *CompanyRepository) CreateCompany(company *domain.CompanyRequest) (*doma
 	insertedCompany.IsDeleted = isDeleted.Valid && isDeleted.Bool
 
 	return insertedCompany, nil
+}
+
+func (r *CompanyRepository) CreateCompanyObject(object *domain.CompanyObject) (*domain.CompanyObject, error) {
+	// Проверяем валидность данных
+	if object == nil {
+		return nil, errors.New("company object is nil")
+	}
+
+	query := `
+	INSERT INTO business_types 
+	(id, company_id, business_type, city, email, working_time, trc, business_address, floor, business_line, business_number) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+	RETURNING id`
+
+	// Генерируем новый UUID для поля id
+	newID := uuid.New()
+
+	// Выполняем запрос с передачей параметров
+	err := r.db.QueryRow(
+		query,
+		newID,
+		object.CompanyID,
+		object.TypeBusines,
+		object.City,
+		object.Email,
+		object.BusinessTime,
+		object.Trc,
+		object.BusinessAddress,
+		object.Floor,
+		object.Column,
+		object.NumberColumn,
+	).Scan(&object.ID)
+
+	if err != nil {
+		log.Println("Failed to insert company object:", err)
+		return nil, fmt.Errorf("error creating company object: %w", err)
+	}
+
+	object.ID = newID.String()
+
+	return object, nil
 }
 
 func (r *CompanyRepository) GetCompanies() ([]*domain.Company, error) {

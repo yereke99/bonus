@@ -25,6 +25,7 @@ type IJWTServices interface {
 
 type ICompanyService interface {
 	CreateCompany(model *domain.CompanyRequest) (*domain.Company, error)
+	CreateCompanyObject(model *domain.CompanyObject) (*domain.CompanyObject, error)
 	GetCompanies() ([]*domain.Company, error)
 }
 

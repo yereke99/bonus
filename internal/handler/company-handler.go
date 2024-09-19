@@ -33,7 +33,17 @@ func (h *Handler) CreateCompany(c *gin.Context) {
 }
 
 func (h *Handler) CreateCompanyObject(c *gin.Context) {
+	var object domain.CompanyObject
+	if err := c.ShouldBindJSON(&object); err != nil {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
 
+	c.JSON(http.StatusCreated, "")
 }
 
 func (h *Handler) CompanyLogin(c *gin.Context) {
