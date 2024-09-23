@@ -43,11 +43,31 @@ func (h *Handler) CreateCompanyObject(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, "")
+	resp, err := h.service.CompanyService.CreateCompanyObject(&object)
+	if err != nil {
+		c.JSON(
+			http.StatusConflict, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	c.JSON(http.StatusCreated, resp)
 }
 
 func (h *Handler) CompanyLogin(c *gin.Context) {
+	var sign domain.Registry
+	if err := c.ShouldBindJSON(&sign); err != nil {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
 
+	c.JSON(http.StatusOK, "")
 }
 
 // GetCompanies godoc
