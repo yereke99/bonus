@@ -1,0 +1,25 @@
+# Ignore the build directory
+build/
+
+# Ignore Git directory and Git-related files
+.git/
+.gitignore
+
+# Ignore log files
+*.log
+
+# Ignore IDE/editor config files and folders (for popular editors)
+.vscode/
+.idea/
+*.swp
+
+# Ignore Dockerfile-related temporary files
+Dockerfile.*
+.dockerignore
+
+# Ignore specific environment files
+.env
+.env.local
+
+# Ignore compiled binaries
+bin/
