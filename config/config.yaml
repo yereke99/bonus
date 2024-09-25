@@ -1,8 +1,8 @@
 USER_NAME: myusername
 PASSWORD: mypassword
 database:
-  host: postgres
-  user: postgres_user
-  password: postgres_password
+  host: localhost
+  user: postgres
+  password: 123456
   port: "5432"
-  database: wbs_database
+  database: postgres

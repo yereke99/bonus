@@ -6,8 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-
-	"github.com/google/uuid"
 )
 
 type CompanyRepository struct {
@@ -20,6 +18,7 @@ func NewCompanyRepository(db *sql.DB) *CompanyRepository {
 	}
 }
 
+// Функция для создания компании
 func (r *CompanyRepository) CreateCompany(company *domain.CompanyRequest) (*domain.Company, error) {
 	query := `
 		INSERT INTO company (company, company_name, email, city, company_address, company_iin, bonus) 
@@ -39,7 +38,7 @@ func (r *CompanyRepository) CreateCompany(company *domain.CompanyRequest) (*doma
 		company.CompanyIIN,
 		company.Bonus,
 	).Scan(
-		&insertedCompany.ID, // ID is now a string
+		&insertedCompany.ID, // ID теперь генерируется в базе
 		&insertedCompany.Company,
 		&insertedCompany.CompanyName,
 		&insertedCompany.Email,
@@ -53,12 +52,13 @@ func (r *CompanyRepository) CreateCompany(company *domain.CompanyRequest) (*doma
 		return nil, err
 	}
 
-	// Set isDeleted value in insertedCompany
+	// Устанавливаем значение isDeleted в объекте компании
 	insertedCompany.IsDeleted = isDeleted.Valid && isDeleted.Bool
 
 	return insertedCompany, nil
 }
 
+// Функция для создания объекта компании
 func (r *CompanyRepository) CreateCompanyObject(object *domain.CompanyObject) (*domain.CompanyObject, error) {
 	// Проверяем валидность данных
 	if object == nil {
@@ -67,17 +67,13 @@ func (r *CompanyRepository) CreateCompanyObject(object *domain.CompanyObject) (*
 
 	query := `
 	INSERT INTO business_types 
-	(id, company_id, business_type, city, email, working_time, trc, business_address, floor, business_line, business_number) 
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+	(company_id, business_type, city, email, working_time, trc, business_address, floor, business_line, business_number) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 	RETURNING id`
 
-	// Генерируем новый UUID для поля id
-	newID := uuid.New()
-
-	// Выполняем запрос с передачей параметров
+	// Выполняем запрос без генерации UUID в коде
 	err := r.db.QueryRow(
 		query,
-		newID,
 		object.CompanyID,
 		object.TypeBusines,
 		object.City,
@@ -95,11 +91,10 @@ func (r *CompanyRepository) CreateCompanyObject(object *domain.CompanyObject) (*
 		return nil, fmt.Errorf("error creating company object: %w", err)
 	}
 
-	object.ID = newID.String()
-
 	return object, nil
 }
 
+// Функция для получения списка компаний
 func (r *CompanyRepository) GetCompanies() ([]*domain.Company, error) {
 	query := `
 		SELECT id, company, company_name, email, city, company_address, company_iin, bonus, isDeleted
@@ -119,7 +114,7 @@ func (r *CompanyRepository) GetCompanies() ([]*domain.Company, error) {
 		var isDeleted sql.NullBool
 
 		err := rows.Scan(
-			&company.ID, // ID is now a string
+			&company.ID, // ID теперь генерируется в базе
 			&company.Company,
 			&company.CompanyName,
 			&company.Email,
@@ -133,7 +128,7 @@ func (r *CompanyRepository) GetCompanies() ([]*domain.Company, error) {
 			return nil, err
 		}
 
-		// Set isDeleted value in company
+		// Устанавливаем значение isDeleted в объекте компании
 		company.IsDeleted = isDeleted.Valid && isDeleted.Bool
 
 		companies = append(companies, company)

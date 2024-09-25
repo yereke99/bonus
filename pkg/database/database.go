@@ -36,6 +36,14 @@ func ConnectToDatabase(databaseConfig *config.DatabaseConfig) (*sql.DB, error) {
 }
 
 func Migrate(db *sql.DB, zapLogger *zap.Logger) error {
+	// First, ensure the `uuid-ossp` extension is enabled.
+	extensionQuery := `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
+	_, err := db.Exec(extensionQuery)
+	if err != nil {
+		zapLogger.Error("failed to enable uuid-ossp extension", zap.Error(err))
+		return fmt.Errorf("failed to enable uuid-ossp extension: %w", err)
+	}
+
 	// List of table creation SQL statements
 	sqls := []string{
 		customerTable,
@@ -46,7 +54,7 @@ func Migrate(db *sql.DB, zapLogger *zap.Logger) error {
 
 	// Check if one of the tables already exists (e.g., `code_cache`)
 	query := `SELECT 1 FROM code_cache LIMIT 1`
-	_, err := db.Query(query)
+	_, err = db.Query(query)
 	if err == nil {
 		return domain.ErrExistsTable
 	}
