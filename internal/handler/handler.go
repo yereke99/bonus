@@ -38,7 +38,7 @@ func (h *Handler) InitHandler() *gin.Engine {
 		AllowHeaders:     []string{"Content-Length", "Authorization", "X-CSRF-Token", "Content-Type", "Accept", "X-Requested-With", "Bearer", "Authority"},
 		ExposeHeaders:    []string{"Content-Length", "Authorization", "Content-Type", "application/json", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Accept", "Origin", "Cache-Control", "X-Requested-With"},
 		AllowCredentials: true,
-		AllowOriginFunc:  func(origin string) bool { return origin == "http://localhost:5173" },
+		AllowOriginFunc:  func(origin string) bool { return origin == "https://api.worldbonussystem.com" },
 	}))
 
 	r.GET("/api/v1/ping", func(c *gin.Context) {
