@@ -12,12 +12,15 @@ type IAuthRepository interface {
 	UpdateUser(userID string, user *domain.RegistryRequest) (*domain.RegistryResponse, error)
 	CheckUser(email string) (bool, error)
 	GetUser(email string) (*domain.LoginResponse, error)
+	GetUserTransaction(userId string) ([]string, error)
+	DeleteUser(uuid string) error
 }
 
 type ICompanyRepository interface {
 	CreateCompany(company *domain.CompanyRequest) (*domain.Company, error)
 	CreateCompanyObject(object *domain.CompanyObject) (*domain.CompanyObject, error)
 	GetCompanies() ([]*domain.Company, error)
+	GetCompanyObjects(uuid string) ([]*domain.CompanyObject, error)
 }
 
 type Repositories struct {

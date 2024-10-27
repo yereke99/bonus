@@ -38,3 +38,7 @@ func (s *CompanyService) CreateCompanyObject(model *domain.CompanyObject) (*doma
 func (s *CompanyService) GetCompanies() ([]*domain.Company, error) {
 	return s.repo.CompanyRepository.GetCompanies()
 }
+
+func (s *CompanyService) GetCompanyObjects(companyId string) ([]*domain.CompanyObject, error) {
+	return s.repo.CompanyRepository.GetCompanyObjects(companyId)
+}

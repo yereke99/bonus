@@ -2,6 +2,8 @@ package handler
 
 import (
 	"bonus/internal/domain"
+	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -77,6 +79,83 @@ func (h *Handler) UpdateRegistry(c *gin.Context) {
 
 	// Возвращаем обновленные данные пользователя
 	c.JSON(http.StatusOK, resp)
+}
+
+func (h *Handler) GetUserInfo(c *gin.Context) {
+
+	token := c.GetHeader("Authorization")
+	email, err := h.service.JWTService.GetUserId(token)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	userInfo, err := h.service.AuthService.GetUserInfo(email)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	c.JSON(http.StatusOK, userInfo)
+}
+
+func (h *Handler) GetUserTransaction(c *gin.Context) {
+
+	userId := c.Param("userId")
+	if userId == "" {
+		c.JSON(
+			http.StatusConflict, gin.H{
+				"error": errors.New("userId is empty"),
+			},
+		)
+		return
+	}
+
+	transactions, err := h.service.AuthService.GetUserTransaction(userId)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	c.JSON(http.StatusOK, transactions)
+}
+
+func (h *Handler) DeleteUser(c *gin.Context) {
+
+	uuid := c.Param("uuid")
+
+	if uuid == "" {
+		c.JSON(
+			http.StatusConflict, gin.H{
+				"error": errors.New("uuid is empty"),
+			},
+		)
+		return
+	}
+
+	if err := h.service.AuthService.DeleteUser(uuid); err != nil {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	userUuid := fmt.Sprintf("deleted user %s", uuid)
+	c.JSON(http.StatusOK, userUuid)
 }
 
 func (h *Handler) Login(c *gin.Context) {

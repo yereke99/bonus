@@ -217,3 +217,30 @@ func (r *AuthRepository) GetUser(email string) (*domain.LoginResponse, error) {
 
 	return &user, nil
 }
+
+func (r *AuthRepository) GetUserTransaction(userId string) ([]string, error) {
+
+	return []string{}, nil
+}
+
+func (r *AuthRepository) DeleteUser(uuid string) error {
+	deleteQuery := `UPDATE customer SET isDeleted=true WHERE id=$1`
+
+	// Выполняем запрос
+	result, err := r.db.Exec(deleteQuery, uuid)
+	if err != nil {
+		return err
+	}
+
+	// Проверяем, сколько строк было обновлено
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("no user found with UUID: %s", uuid)
+	}
+
+	return nil
+}

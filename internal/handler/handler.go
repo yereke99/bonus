@@ -54,13 +54,18 @@ func (h *Handler) InitHandler() *gin.Engine {
 	r.POST("/api/v1/login", h.Login)
 	r.POST("/api/v1/refresh", h.RefreshToken)
 
+	r.GET("/api/v1/get-user-info", h.GetUserInfo)
+	r.GET("/api/v1/get-user-transaction/:userId", h.GetUserTransaction)
+	r.DELETE("/api/v1/delete-user/:uuid", h.DeleteUser)
+
 	// 2nd
 	r.GET("/api/v1/user/history")
 	r.POST("/api/v1/user/notify")
 
 	r.POST("/api/v1/company", h.CreateCompany)                     // Создания компаний
 	r.POST("/api/v1/create-company-object", h.CreateCompanyObject) // Создание объекта для компании
-	r.POST("/api/v1/company-object/login", h.CompanyLogin)         // Логин продавца в объект компании
+	r.GET("/api/v1/get-company-object/:companyId", h.GetCompanyObjects)
+	r.POST("/api/v1/company-object/login", h.CompanyLogin) // Логин продавца в объект компании
 	r.POST("/api/v1//client/{id}")
 	r.GET("/api/v1/company", h.GetCompanies)                              // Список компаний
 	r.POST("/api/v1/company/notify", h.NotifyUser)                        // Уведление

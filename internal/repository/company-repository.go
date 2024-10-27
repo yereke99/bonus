@@ -140,3 +140,48 @@ func (r *CompanyRepository) GetCompanies() ([]*domain.Company, error) {
 
 	return companies, nil
 }
+
+func (r *CompanyRepository) GetCompanyObjects(uuid string) ([]*domain.CompanyObject, error) {
+	q := `SELECT id, company_id, typeBusiness, businessName, city, email, businessTime, trc, businessAddress, floor, column, numberColumn, isDeleted FROM business_types WHERE id=$1`
+
+	// Создаем слайс для хранения объектов CompanyObject
+	var companyObjects []*domain.CompanyObject
+
+	// Выполняем запрос к базе данных
+	rows, err := r.db.Query(q, uuid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	// Итерируемся по результатам запроса и маппим их на CompanyObject
+	for rows.Next() {
+		var obj domain.CompanyObject
+		err := rows.Scan(
+			&obj.ID,
+			&obj.CompanyID,
+			&obj.TypeBusines,
+			&obj.BusinesName,
+			&obj.City,
+			&obj.Email,
+			&obj.BusinessTime,
+			&obj.Trc,
+			&obj.BusinessAddress,
+			&obj.Floor,
+			&obj.Column,
+			&obj.NumberColumn,
+			&obj.IsDeleted,
+		)
+		if err != nil {
+			return nil, err
+		}
+		companyObjects = append(companyObjects, &obj)
+	}
+
+	// Проверяем наличие ошибок после итерации
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return companyObjects, nil
+}

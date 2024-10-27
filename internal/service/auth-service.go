@@ -124,3 +124,15 @@ func (s *AuthService) Login(login *domain.Registry) (*domain.LoginResponse, erro
 
 	return user, nil
 }
+
+func (s *AuthService) GetUserInfo(email string) (*domain.LoginResponse, error) {
+	return s.repo.AuthRepository.GetUser(email)
+}
+
+func (s *AuthService) GetUserTransaction(userId string) ([]string, error) {
+	return s.repo.AuthRepository.GetUserTransaction(userId)
+}
+
+func (s *AuthService) DeleteUser(uuid string) error {
+	return s.repo.AuthRepository.DeleteUser(uuid)
+}

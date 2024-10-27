@@ -15,6 +15,9 @@ type IAuthServices interface {
 	Registry(model *domain.RegistryRequest) (*domain.RegistryResponse, error)
 	UpdateUser(userId string, model *domain.RegistryRequest) (*domain.RegistryResponse, error)
 	Login(login *domain.Registry) (*domain.LoginResponse, error)
+	GetUserInfo(email string) (*domain.LoginResponse, error)
+	GetUserTransaction(userId string) ([]string, error)
+	DeleteUser(uuid string) error
 }
 
 type IJWTServices interface {
@@ -30,6 +33,7 @@ type ICompanyService interface {
 	CreateCompany(model *domain.CompanyRequest) (*domain.Company, error)
 	CreateCompanyObject(model *domain.CompanyObject) (*domain.CompanyObject, error)
 	GetCompanies() ([]*domain.Company, error)
+	GetCompanyObjects(companyId string) ([]*domain.CompanyObject, error)
 }
 
 type Services struct {
