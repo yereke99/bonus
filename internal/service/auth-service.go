@@ -129,6 +129,10 @@ func (s *AuthService) GetUserInfo(email string) (*domain.LoginResponse, error) {
 	return s.repo.AuthRepository.GetUser(email)
 }
 
+func (s *AuthService) GetUserInfoTg(email string) (*domain.LoginResponse, error) {
+	return s.repo.AuthRepository.GetUser(email)
+}
+
 func (s *AuthService) GetUserTransaction(userId string) ([]string, error) {
 	return s.repo.AuthRepository.GetUserTransaction(userId)
 }

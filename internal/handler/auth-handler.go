@@ -107,6 +107,22 @@ func (h *Handler) GetUserInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, userInfo)
 }
 
+func (h *Handler) GetUserInfoTg(c *gin.Context) {
+
+	email := c.Param("email")
+	userInfo, err := h.service.AuthService.GetUserInfoTg(email)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	c.JSON(http.StatusOK, userInfo)
+}
+
 func (h *Handler) GetUserTransaction(c *gin.Context) {
 
 	userId := c.Param("userId")

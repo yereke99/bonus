@@ -55,6 +55,7 @@ func (h *Handler) InitHandler() *gin.Engine {
 	r.POST("/api/v1/refresh", h.RefreshToken)
 
 	r.GET("/api/v1/get-user-info", h.GetUserInfo)
+	r.GET("/api/v1/get-user-info-tg-bot/:email", h.GetUserInfoTg)
 	r.GET("/api/v1/get-user-transaction/:userId", h.GetUserTransaction)
 	r.DELETE("/api/v1/delete-user/:uuid", h.DeleteUser)
 

@@ -16,6 +16,7 @@ type IAuthServices interface {
 	UpdateUser(userId string, model *domain.RegistryRequest) (*domain.RegistryResponse, error)
 	Login(login *domain.Registry) (*domain.LoginResponse, error)
 	GetUserInfo(email string) (*domain.LoginResponse, error)
+	GetUserInfoTg(email string) (*domain.LoginResponse, error)
 	GetUserTransaction(userId string) ([]string, error)
 	DeleteUser(uuid string) error
 }
