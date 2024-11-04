@@ -12,4 +12,5 @@ var (
 	ErrTimeOut       = errors.New("ping command timed out")
 	ErrNoHubs        = errors.New("no hubs found")
 	ErrNoDevices     = errors.New("no devices found")
+	ErrUserNotFound  = errors.New("user not found")
 )

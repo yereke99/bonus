@@ -108,19 +108,34 @@ func (h *Handler) GetUserInfo(c *gin.Context) {
 }
 
 func (h *Handler) GetUserInfoTg(c *gin.Context) {
-
 	email := c.Param("email")
-	userInfo, err := h.service.AuthService.GetUserInfoTg(email)
-	if err != nil {
-		c.JSON(
-			http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			},
-		)
+
+	// Проверка корректности email
+	if email == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Email is required",
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, userInfo)
+	// Вызов метода для получения информации о пользователе
+	userInfo, err := h.service.AuthService.GetUserInfoTg(email)
+	if err != nil {
+		// Обработка ошибки с дополнительной проверкой на тип ошибки
+		status := http.StatusInternalServerError
+		if errors.Is(err, domain.ErrUserNotFound) {
+			status = http.StatusNotFound
+		}
+		c.JSON(status, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	// Успешный ответ
+	c.JSON(http.StatusOK, gin.H{
+		"user": userInfo,
+	})
 }
 
 func (h *Handler) GetUserTransaction(c *gin.Context) {
