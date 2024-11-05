@@ -141,6 +141,143 @@ func (r *CompanyRepository) GetCompanies() ([]*domain.Company, error) {
 	return companies, nil
 }
 
+func (r *CompanyRepository) GetCompanyObjectTransAction(companyId string) (*domain.CompanyObjectTransAction, error) {
+
+	return &domain.CompanyObjectTransAction{}, nil
+}
+
+func (r *CompanyRepository) GetCompanyObjectInfo(companyId string) (*domain.CompanyObject, error) {
+	query := `
+        SELECT
+            id,
+            company_id,
+            business_type AS typeBusiness,
+            business_line AS businessName,
+            city,
+            email,
+            working_time AS businessTime,
+            trc,
+            business_address AS businessAddress,
+            floor,
+            business_line AS column,
+            business_number AS numberColumn,
+            false AS isDeleted
+        FROM business_types
+        WHERE company_id = $1
+        LIMIT 1
+    `
+
+	row := r.db.QueryRow(query, companyId)
+
+	var obj domain.CompanyObject
+	err := row.Scan(
+		&obj.ID,
+		&obj.CompanyID,
+		&obj.TypeBusines,
+		&obj.BusinesName,
+		&obj.City,
+		&obj.Email,
+		&obj.BusinessTime,
+		&obj.Trc,
+		&obj.BusinessAddress,
+		&obj.Floor,
+		&obj.Column,
+		&obj.NumberColumn,
+		&obj.IsDeleted,
+	)
+	if err == sql.ErrNoRows {
+		return nil, nil // Вернуть nil, если компания с указанным ID не найдена
+	} else if err != nil {
+		return nil, err // Возвращаем ошибку, если возникла другая ошибка
+	}
+
+	return &obj, nil
+}
+
+func (r *CompanyRepository) AddBonusUser(transaction *domain.UserTransaction) (*domain.LoginResponse, error) {
+	// Обновляем бонус пользователя
+	updateQuery := `
+        UPDATE customer
+        SET bonus = bonus + $1
+        WHERE id = $2
+        RETURNING id, user_name, user_last_name, email, locations, city, qr, bonus, token, isDeleted
+    `
+
+	var response domain.LoginResponse
+	err := r.db.QueryRow(
+		updateQuery,
+		transaction.Bonus,
+		transaction.UserId,
+	).Scan(
+		&response.ID,
+		&response.UserName,
+		&response.UserLastName,
+		&response.Email,
+		&response.Locations,
+		&response.City,
+		&response.QR,
+		&response.Bonus,
+		&response.Token,
+		&response.IsDeleted,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (r *CompanyRepository) RemoveBonusUser(transaction *domain.UserTransaction) (*domain.LoginResponse, error) {
+	// Проверяем текущий бонус пользователя
+	var currentBonus int
+	checkQuery := `SELECT bonus FROM customer WHERE id = $1`
+	err := r.db.QueryRow(checkQuery, transaction.UserId).Scan(&currentBonus)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("user not found")
+		}
+		return nil, err
+	}
+
+	// Проверка на то, что бонус не станет отрицательным
+	if currentBonus < transaction.Bonus {
+		return nil, errors.New("insufficient bonus")
+	}
+
+	// Обновляем бонус пользователя
+	updateQuery := `
+        UPDATE customer
+        SET bonus = bonus - $1
+        WHERE id = $2
+        RETURNING id, user_name, user_last_name, email, locations, city, qr, bonus, token, isDeleted
+    `
+
+	var response domain.LoginResponse
+	err = r.db.QueryRow(
+		updateQuery,
+		transaction.Bonus,
+		transaction.UserId,
+	).Scan(
+		&response.ID,
+		&response.UserName,
+		&response.UserLastName,
+		&response.Email,
+		&response.Locations,
+		&response.City,
+		&response.QR,
+		&response.Bonus,
+		&response.Token,
+		&response.IsDeleted,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (r *CompanyRepository) GetCompanyObjects(uuid string) ([]*domain.CompanyObject, error) {
 	q := `SELECT id, company_id, typeBusiness, businessName, city, email, businessTime, trc, businessAddress, floor, column, numberColumn, isDeleted FROM business_types WHERE id=$1`
 

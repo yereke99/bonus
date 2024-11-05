@@ -34,7 +34,10 @@ type ICompanyService interface {
 	CreateCompany(model *domain.CompanyRequest) (*domain.Company, error)
 	CreateCompanyObject(model *domain.CompanyObject) (*domain.CompanyObject, error)
 	GetCompanies() ([]*domain.Company, error)
+	AddBonusUser(transaction *domain.UserTransaction) (*domain.LoginResponse, error)
+	GetCompanyObjectInfo(companyId string) (*domain.CompanyObject, error)
 	GetCompanyObjects(companyId string) ([]*domain.CompanyObject, error)
+	GetCompanyObjectTransAction(companyId string) (*domain.CompanyObjectTransAction, error)
 }
 
 type Services struct {

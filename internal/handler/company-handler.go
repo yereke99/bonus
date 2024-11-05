@@ -68,7 +68,12 @@ func (h *Handler) CompanyLogin(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "")
+	if err := h.service.AuthService.SendCode(&sign); err != nil {
+		c.JSON(http.StatusConflict, gin.H{"error": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, "sent")
 }
 
 // GetCompanies godoc
@@ -89,10 +94,57 @@ func (h *Handler) GetCompanies(c *gin.Context) {
 	c.JSON(http.StatusOK, companies)
 }
 
+func (h *Handler) GetUserByQR(c *gin.Context) {
+
+	qrCode := c.Param("qr")
+	if qrCode == " " {
+		c.JSON(
+			http.StatusConflict, gin.H{
+				"error": errors.New("companyId is empty"),
+			},
+		)
+		return
+	}
+
+	user := domain.LoginResponse{
+		UserName:     "Azat",
+		UserLastName: "Zhenisov",
+		Email:        "zhenisovAzat@gmail.com",
+		Locations:    "Kazakhstan",
+		City:         "Almaty",
+		Bonus:        1000,
+		Token:        "Ahsahsa763ujksjkJKJAJKSH&*HSJKSJKSJKSJhshajahsjeyjkqm!(2j3339222",
+		IsDeleted:    false,
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
+func (h *Handler) GetProductByQR(c *gin.Context) {
+
+	qrCode := c.Param("qr")
+	if qrCode == " " {
+		c.JSON(
+			http.StatusConflict, gin.H{
+				"error": errors.New("companyId is empty"),
+			},
+		)
+		return
+	}
+
+	product := domain.Product{
+		Type:    "Adidas adios 5",
+		BarCode: "",
+		Sum:     50000,
+	}
+
+	c.JSON(http.StatusOK, product)
+}
+
 func (h *Handler) GetCompanyObjects(c *gin.Context) {
 
 	companyId := c.Param("companyId")
-	if companyId == "" {
+	if companyId == " " {
 		c.JSON(
 			http.StatusConflict, gin.H{
 				"error": errors.New("companyId is empty"),
@@ -112,6 +164,105 @@ func (h *Handler) GetCompanyObjects(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, companyObjects)
+}
+
+func (h *Handler) GetCompanyObjectInfo(c *gin.Context) {
+	companyId := c.Param("companyId")
+
+	if companyId == " " {
+		c.JSON(
+			http.StatusConflict, gin.H{
+				"error": errors.New("companyId is empty"),
+			},
+		)
+		return
+	}
+
+	info, err := h.service.CompanyService.GetCompanyObjectInfo(companyId)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	c.JSON(http.StatusOK, info)
+}
+
+func (h *Handler) GetCompanyObjectTransAction(c *gin.Context) {
+	companyId := c.Param("companyId")
+
+	if companyId == " " {
+		c.JSON(
+			http.StatusConflict, gin.H{
+				"error": errors.New("companyId is empty"),
+			},
+		)
+		return
+	}
+
+	info, err := h.service.CompanyService.GetCompanyObjectTransAction(companyId)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	c.JSON(http.StatusOK, info)
+}
+
+func (h *Handler) AddBonusToUser(c *gin.Context) {
+
+	var transaction domain.UserTransaction
+	if err := c.ShouldBindJSON(&transaction); err != nil {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	data, err := h.service.CompanyService.AddBonusUser(&transaction)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	c.JSON(http.StatusOK, data)
+}
+
+func (h *Handler) RemoveBonusToUser(c *gin.Context) {
+	var transaction domain.UserTransaction
+	if err := c.ShouldBindJSON(&transaction); err != nil {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	data, err := h.service.CompanyService.AddBonusUser(&transaction)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	c.JSON(http.StatusOK, data)
 }
 
 // NotifyUser godoc

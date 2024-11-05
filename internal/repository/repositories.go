@@ -20,7 +20,11 @@ type ICompanyRepository interface {
 	CreateCompany(company *domain.CompanyRequest) (*domain.Company, error)
 	CreateCompanyObject(object *domain.CompanyObject) (*domain.CompanyObject, error)
 	GetCompanies() ([]*domain.Company, error)
+	AddBonusUser(transaction *domain.UserTransaction) (*domain.LoginResponse, error)
+	RemoveBonusUser(transaction *domain.UserTransaction) (*domain.LoginResponse, error)
+	GetCompanyObjectInfo(companyId string) (*domain.CompanyObject, error)
 	GetCompanyObjects(uuid string) ([]*domain.CompanyObject, error)
+	GetCompanyObjectTransAction(companyId string) (*domain.CompanyObjectTransAction, error)
 }
 
 type Repositories struct {

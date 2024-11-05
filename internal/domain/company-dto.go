@@ -38,6 +38,25 @@ type CompanyObject struct {
 	IsDeleted       bool   `json:"isDeleted"`
 }
 
+type UserTransaction struct {
+	UserId       string
+	SumOfProduct int
+	Bonus        int
+}
+
+type CompanyObjectTransAction struct {
+	UserId       string
+	SumOfProduct int
+	BarCode      string
+	Bonus        int
+}
+
+type Product struct {
+	Type    string
+	BarCode string
+	Sum     int
+}
+
 type NotificationRequest struct{}
 
 type BonusCalculationRequest struct{}
