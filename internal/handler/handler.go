@@ -67,7 +67,7 @@ func (h *Handler) InitHandler() *gin.Engine {
 	r.POST("/api/v1/create-company-object", h.CreateCompanyObject) // Создание объекта для компании
 	r.GET("/api/v1/get-company-object/:companyId", h.GetCompanyObjects)
 	r.POST("/api/v1/company-object/login", h.CompanyLogin) // Логин продавца в объект компании
-	r.GET("/api/v1/company-object/transaction", h.GetCompanyObjectTransAction)
+	r.GET("/api/v1/company-object/transaction/:companyId", h.GetCompanyObjectTransAction)
 	r.GET("/api/v1/company-object/info/:companyId", h.GetCompanyObjectInfo)
 	r.GET("/api/v1/company-object/get-user-by-id/:qr", h.GetUserByQR)
 	r.GET("/api/v1/company-object/get-product-by-id/:qr", h.GetProductByQR)
